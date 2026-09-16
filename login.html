@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Admin Login — KIDD OG STORE</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="icon" href="logo.jpeg" type="image/jpeg">
+<style>
+:root[data-theme="dark"]{
+  --bg:#05070d;--surface:#0d1220;--surface-2:#131a2c;--border:#1e2740;--border-soft:#141c30;
+  --text:#fff;--text-2:#c7d0e0;--muted:#8892a6;--accent:#00e0ff;--accent-2:#7c3aed;
+  --accent-soft:rgba(0,224,255,0.12);--grad:linear-gradient(135deg,#00e0ff 0%,#7c3aed 100%);
+  --shadow:0 20px 60px rgba(0,0,0,0.5);--shadow-accent:0 0 40px rgba(0,224,255,0.2);
+}
+:root[data-theme="light"]{
+  --bg:#f4f6fb;--surface:#fff;--surface-2:#eef1f8;--border:#dfe4ee;--border-soft:#eaeef7;
+  --text:#0a1226;--text-2:#2a3550;--muted:#6b7690;--accent:#0091c2;--accent-2:#6d28d9;
+  --accent-soft:rgba(0,145,194,0.10);--grad:linear-gradient(135deg,#0091c2 0%,#6d28d9 100%);
+  --shadow:0 20px 60px rgba(10,18,38,0.12);--shadow-accent:0 0 30px rgba(0,145,194,0.15);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{
+  min-height:100vh;background:var(--bg);color:var(--text);
+  font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;
+  padding:20px;position:relative;overflow:hidden;
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(600px circle at 20% 10%,rgba(0,224,255,0.10),transparent 45%),
+             radial-gradient(600px circle at 80% 80%,rgba(124,58,237,0.12),transparent 45%);
+}
+.card{
+  position:relative;z-index:1;width:100%;max-width:400px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:28px;padding:36px 28px;
+  box-shadow:var(--shadow);animation:fadeUp 0.5s ease;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.logo{
+  width:70px;height:70px;border-radius:20px;background:var(--surface-2);
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
+  margin:0 auto 20px;overflow:hidden;box-shadow:var(--shadow-accent);
+}
+.logo img{width:100%;height:100%;object-fit:contain;padding:6px}
+h1{font-size:24px;font-weight:900;text-align:center;letter-spacing:-0.7px;margin-bottom:6px}
+.sub{font-size:13px;color:var(--muted);text-align:center;font-weight:500;margin-bottom:28px;line-height:1.5}
+.field{margin-bottom:14px;position:relative}
+.field label{
+  display:block;font-size:11px;font-weight:800;color:var(--text-2);
+  margin-bottom:6px;letter-spacing:0.4px;text-transform:uppercase;
+}
+.field input{
+  width:100%;background:var(--surface-2);border:1px solid var(--border);
+  border-radius:14px;padding:14px 16px 14px 44px;color:var(--text);
+  font-size:14px;font-family:inherit;font-weight:500;outline:none;transition:0.2s;
+}
+.field input:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft);background:var(--surface)}
+.field .fi{position:absolute;left:16px;bottom:14px;color:var(--muted);font-size:14px;pointer-events:none}
+.pwd-toggle{
+  position:absolute;right:14px;bottom:12px;color:var(--muted);font-size:14px;
+  cursor:pointer;padding:4px;background:none;border:none;
+}
+.submit{
+  width:100%;padding:15px;border:none;border-radius:14px;
+  background:var(--grad);color:#000;font-family:inherit;font-size:14px;font-weight:900;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  cursor:pointer;transition:0.2s;margin-top:8px;letter-spacing:0.3px;
+}
+:root[data-theme="light"] .submit{color:#fff}
+.submit:active{transform:scale(0.97)}
+.submit:disabled{opacity:0.6;cursor:not-allowed}
+.msg{
+  padding:12px 14px;border-radius:12px;font-size:12px;font-weight:700;
+  margin-bottom:16px;display:none;text-align:center;line-height:1.4;
+}
+.msg.err{display:block;background:rgba(239,68,68,0.12);color:#ef4444;border:1px solid rgba(239,68,68,0.3)}
+.msg.ok{display:block;background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid rgba(34,197,94,0.3)}
+.back{
+  text-align:center;margin-top:22px;font-size:12px;font-weight:600;color:var(--muted);
+}
+.back a{color:var(--accent);text-decoration:none;font-weight:800}
+.theme-btn{
+  position:fixed;top:20px;right:20px;z-index:5;width:42px;height:42px;border-radius:12px;
+  background:var(--surface);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text);font-size:14px;cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<button class="theme-btn" id="themeToggle"><i class="fas fa-sun"></i></button>
+
+<div class="card">
+  <div class="logo"><img src="logo.jpeg" alt="KIDD OG STORE" onerror="this.parentElement.innerHTML='<i class=\'fas fa-shield-halved\' style=\'font-size:30px;color:var(--accent)\'></i>'"></div>
+  <h1>Admin Login</h1>
+  <p class="sub">Authorized personnel only.<br>Manage KIDD OG STORE accounts.</p>
+
+  <div class="msg" id="msg"></div>
+
+  <div class="field">
+    <label>Email</label>
+    <i class="fas fa-envelope fi"></i>
+    <input type="email" id="email" placeholder="you@example.com" autocomplete="username">
+  </div>
+
+  <div class="field">
+    <label>Password</label>
+    <i class="fas fa-lock fi"></i>
+    <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+    <button class="pwd-toggle" id="pwdToggle" type="button"><i class="fas fa-eye"></i></button>
+  </div>
+
+  <button class="submit" id="submitBtn"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+
+  <div class="back"><a href="index.html"><i class="fas fa-arrow-left"></i> Back to store</a></div>
+</div>
+
+<script type="module">
+import { auth } from './firebase-config.js';
+import { signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+// ============ ADMIN EMAILS (hardcoded) ============
+const ADMINS = [
+  "morireoluwaadewuyi@gmail.com",
+  "joenation98@gmail.com"
+];
+
+// ============ THEME ============
+const savedTheme = localStorage.getItem('kidd_theme') || 'dark';
+document.documentElement.setAttribute('data-theme', savedTheme);
+const themeToggle = document.getElementById('themeToggle');
+themeToggle.innerHTML = savedTheme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+themeToggle.addEventListener('click', () => {
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('kidd_theme', next);
+  themeToggle.innerHTML = next === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+});
+
+// ============ PASSWORD TOGGLE ============
+const pwdInput = document.getElementById('password');
+document.getElementById('pwdToggle').addEventListener('click', () => {
+  const isPwd = pwdInput.type === 'password';
+  pwdInput.type = isPwd ? 'text' : 'password';
+  document.getElementById('pwdToggle').innerHTML = isPwd
+    ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
+});
+
+// ============ MESSAGE ============
+const msg = document.getElementById('msg');
+function showMsg(text, type = 'err'){
+  msg.textContent = text;
+  msg.className = 'msg ' + type;
+}
+
+// ============ SUBMIT ============
+const btn = document.getElementById('submitBtn');
+const emailInput = document.getElementById('email');
+
+btn.addEventListener('click', doLogin);
+emailInput.addEventListener('keypress', e => { if (e.key === 'Enter') doLogin(); });
+pwdInput.addEventListener('keypress', e => { if (e.key === 'Enter') doLogin(); });
+
+async function doLogin(){
+  const email = emailInput.value.trim().toLowerCase();
+  const password = pwdInput.value;
+
+  if (!email || !password){ showMsg('Please enter email and password'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+  msg.className = 'msg';
+
+  try {
+    // 1. Firebase Auth check
+    const cred = await signInWithEmailAndPassword(auth, email, password);
+    const userEmail = (cred.user.email || '').toLowerCase();
+
+    // 2. Is this user in the admin list?
+    if (!ADMINS.includes(userEmail)) {
+      await signOut(auth);
+      showMsg('Access denied — this account is not an admin.');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+      return;
+    }
+
+    // 3. Success
+    showMsg('Welcome back! Redirecting...', 'ok');
+    btn.innerHTML = '<i class="fas fa-check"></i> Success';
+    setTimeout(() => { window.location.href = 'admin.html'; }, 700);
+
+  } catch (err) {
+    console.error(err);
+    let message = 'Login failed.';
+    if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found'){
+      message = 'Wrong email or password.';
+    } else if (err.code === 'auth/too-many-requests'){
+      message = 'Too many attempts. Try again in a few minutes.';
+    } else if (err.code === 'auth/invalid-email'){
+      message = 'Invalid email format.';
+    } else if (err.code === 'auth/network-request-failed'){
+      message = 'Network error. Check your connection.';
+    }
+    showMsg(message);
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+  }
+}
+</script>
+</body>
+</html>
