@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Admin Dashboard — KIDD OG STORE</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="icon" href="logo.jpeg" type="image/jpeg">
+<style>
+:root[data-theme="dark"]{
+  --bg:#05070d;--bg-glow-1:rgba(0,224,255,0.08);--bg-glow-2:rgba(124,58,237,0.10);
+  --surface:#0d1220;--surface-2:#131a2c;--surface-3:#1a2340;--border:#1e2740;--border-soft:#141c30;
+  --text:#fff;--text-2:#c7d0e0;--muted:#8892a6;--accent:#00e0ff;--accent-2:#7c3aed;
+  --accent-soft:rgba(0,224,255,0.12);--success:#22c55e;--danger:#ef4444;--warn:#f59e0b;
+  --grad:linear-gradient(135deg,#00e0ff 0%,#7c3aed 100%);
+  --shadow:0 8px 30px rgba(0,0,0,0.4);--shadow-accent:0 0 30px rgba(0,224,255,0.18);
+}
+:root[data-theme="light"]{
+  --bg:#f4f6fb;--bg-glow-1:rgba(0,180,255,0.10);--bg-glow-2:rgba(124,58,237,0.08);
+  --surface:#fff;--surface-2:#eef1f8;--surface-3:#e2e7f3;--border:#dfe4ee;--border-soft:#eaeef7;
+  --text:#0a1226;--text-2:#2a3550;--muted:#6b7690;--accent:#0091c2;--accent-2:#6d28d9;
+  --accent-soft:rgba(0,145,194,0.10);--success:#16a34a;--danger:#dc2626;--warn:#d97706;
+  --grad:linear-gradient(135deg,#0091c2 0%,#6d28d9 100%);
+  --shadow:0 8px 30px rgba(10,18,38,0.08);--shadow-accent:0 0 25px rgba(0,145,194,0.15);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{
+  background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;
+  padding-bottom:100px;min-height:100vh;overflow-x:hidden;position:relative;
+  transition:background 0.35s ease,color 0.35s ease;
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(600px circle at 10% 0%,var(--bg-glow-1),transparent 45%),
+             radial-gradient(600px circle at 90% 30%,var(--bg-glow-2),transparent 45%);
+}
+main,header{position:relative;z-index:1}
+
+/* HEADER */
+.header{
+  position:sticky;top:0;z-index:100;
+  background:color-mix(in srgb,var(--bg) 85%,transparent);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border-soft);
+  padding:12px 18px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.brand{display:flex;align-items:center;gap:12px}
+.logo-slot{
+  width:42px;height:42px;border-radius:13px;background:var(--surface);
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
+  overflow:hidden;box-shadow:var(--shadow-accent);flex-shrink:0;
+}
+.logo-slot img{width:100%;height:100%;object-fit:contain;padding:3px}
+.brand-text h1{font-size:14px;font-weight:900;letter-spacing:-0.3px;line-height:1.1}
+.brand-text p{font-size:9px;color:var(--muted);font-weight:800;letter-spacing:1.2px;text-transform:uppercase;margin-top:2px}
+.header-actions{display:flex;gap:8px;align-items:center}
+.icon-btn{
+  width:40px;height:40px;border-radius:12px;
+  background:var(--surface);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text);font-size:14px;cursor:pointer;transition:0.2s;text-decoration:none;
+}
+.icon-btn:active{transform:scale(0.9)}
+.icon-btn.accent{color:var(--accent);border-color:var(--accent);box-shadow:var(--shadow-accent)}
+.icon-btn.danger{color:var(--danger)}
+
+/* PROFILE */
+.profile{
+  margin:18px;padding:20px;border-radius:22px;
+  background:var(--surface);border:1px solid var(--border);
+  box-shadow:var(--shadow);animation:fadeUp 0.5s ease;
+  display:flex;align-items:center;gap:16px;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.profile-avatar{
+  width:60px;height:60px;border-radius:20px;background:var(--grad);color:#000;
+  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:22px;
+  flex-shrink:0;text-transform:uppercase;box-shadow:var(--shadow-accent);
+}
+:root[data-theme="light"] .profile-avatar{color:#fff}
+.profile-info{flex:1;min-width:0}
+.profile-info h2{font-size:16px;font-weight:900;letter-spacing:-0.3px;margin-bottom:3px}
+.profile-info .email{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:6px;word-break:break-all}
+.role-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  background:var(--accent-soft);color:var(--accent);
+  font-size:9px;font-weight:900;padding:4px 10px;border-radius:8px;
+  letter-spacing:0.6px;text-transform:uppercase;
+}
+
+/* TABS */
+.tabs{
+  display:flex;gap:8px;padding:0 18px 16px;overflow-x:auto;scrollbar-width:none;
+}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  flex-shrink:0;padding:11px 16px;border-radius:13px;
+  background:var(--surface);border:1px solid var(--border);
+  font-size:12px;font-weight:800;color:var(--muted);
+  cursor:pointer;transition:0.2s;font-family:inherit;
+  display:flex;align-items:center;gap:7px;
+}
+.tab i{font-size:12px}
+.tab.active{background:var(--grad);color:#000;border-color:transparent;box-shadow:var(--shadow-accent)}
+:root[data-theme="light"] .tab.active{color:#fff}
+
+/* PANELS */
+.panel{display:none;padding:0 18px;animation:fadeUp 0.4s ease}
+.panel.active{display:block}
+
+/* CARD / FORM */
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:22px;padding:22px;margin-bottom:16px;box-shadow:var(--shadow);
+}
+.card-title{font-size:16px;font-weight:900;letter-spacing:-0.3px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.card-title i{color:var(--accent);font-size:15px}
+.card-sub{font-size:11px;color:var(--muted);font-weight:500;margin-bottom:18px;line-height:1.5}
+
+.form-label{
+  display:block;font-size:10px;font-weight:800;color:var(--text-2);
+  margin-bottom:6px;letter-spacing:0.5px;text-transform:uppercase;
+}
+.form-input,.form-textarea,.form-select{
+  width:100%;background:var(--surface-2);border:1px solid var(--border);
+  border-radius:12px;padding:13px 14px;color:var(--text);
+  font-size:13px;font-family:inherit;font-weight:500;outline:none;transition:0.2s;
+  margin-bottom:14px;
+}
+.form-input:focus,.form-textarea:focus,.form-select:focus{
+  border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);background:var(--surface);
+}
+.form-textarea{resize:none;min-height:90px;line-height:1.5}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-row .form-input,.form-row .form-select{margin-bottom:14px}
+
+/* UPLOAD */
+.upload-zone{
+  border:2px dashed var(--border);border-radius:16px;
+  padding:22px;text-align:center;cursor:pointer;
+  transition:0.2s;background:var(--surface-2);margin-bottom:14px;
+}
+.upload-zone:hover{border-color:var(--accent);background:var(--accent-soft)}
+.upload-zone i{font-size:26px;color:var(--accent);margin-bottom:8px;display:block}
+.upload-zone p{font-size:12px;font-weight:700;color:var(--text-2);margin-bottom:3px}
+.upload-zone small{font-size:10px;color:var(--muted);font-weight:500}
+.upload-zone input{display:none}
+
+.media-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));
+  gap:8px;margin-bottom:14px;
+}
+.media-item{
+  position:relative;border-radius:12px;overflow:hidden;
+  aspect-ratio:1;background:var(--surface-2);border:1px solid var(--border);
+}
+.media-item img,.media-item video{width:100%;height:100%;object-fit:cover}
+.media-item .remove{
+  position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;
+  background:var(--danger);color:#fff;border:none;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;cursor:pointer;z-index:2;
+}
+.media-item .type-badge{
+  position:absolute;bottom:4px;left:4px;
+  background:rgba(0,0,0,0.7);color:#fff;
+  font-size:8px;font-weight:900;padding:2px 6px;border-radius:5px;
+  letter-spacing:0.5px;
+}
+
+/* BUTTONS */
+.btn{
+  width:100%;padding:14px;border:none;border-radius:13px;
+  font-family:inherit;font-size:13px;font-weight:900;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  cursor:pointer;transition:0.2s;letter-spacing:0.2px;
+}
+.btn:active{transform:scale(0.97)}
+.btn:disabled{opacity:0.6;cursor:not-allowed}
+.btn-primary{background:var(--grad);color:#000}
+:root[data-theme="light"] .btn-primary{color:#fff}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-warn{background:var(--warn);color:#fff}
+.btn-success{background:var(--success);color:#fff}
+.btn-ghost{background:var(--surface-2);color:var(--text);border:1px solid var(--border)}
+
+/* LIST */
+.item{
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:16px;padding:14px;margin-bottom:12px;
+  display:flex;gap:12px;align-items:flex-start;
+}
+.item-thumb{
+  width:64px;height:64px;border-radius:12px;background:var(--surface);
+  border:1px solid var(--border);overflow:hidden;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.item-thumb img,.item-thumb video{width:100%;height:100%;object-fit:cover}
+.item-thumb i{color:var(--muted);font-size:22px}
+.item-body{flex:1;min-width:0}
+.item-name{font-size:13px;font-weight:800;margin-bottom:4px;line-height:1.3}
+.item-meta{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px;display:flex;gap:8px;flex-wrap:wrap}
+.item-price{font-size:14px;font-weight:900;color:var(--accent)}
+.item-price s{font-size:11px;color:var(--muted);font-weight:700;margin-left:6px}
+.badge{
+  display:inline-block;font-size:9px;font-weight:900;
+  padding:3px 8px;border-radius:6px;letter-spacing:0.5px;text-transform:uppercase;
+}
+.badge-sold{background:rgba(239,68,68,0.15);color:var(--danger)}
+.badge-feat{background:rgba(245,158,11,0.15);color:var(--warn)}
+.badge-pending{background:rgba(245,158,11,0.15);color:var(--warn)}
+.badge-approved{background:rgba(34,197,94,0.15);color:var(--success)}
+.badge-live{background:var(--accent-soft);color:var(--accent)}
+.item-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.mini-btn{
+  padding:8px 12px;border-radius:10px;border:1px solid var(--border);
+  background:var(--surface);color:var(--text-2);
+  font-family:inherit;font-size:11px;font-weight:800;
+  cursor:pointer;transition:0.2s;display:inline-flex;align-items:center;gap:5px;
+}
+.mini-btn:active{transform:scale(0.94)}
+.mini-btn.danger{color:var(--danger);border-color:rgba(239,68,68,0.3)}
+.mini-btn.success{color:var(--success);border-color:rgba(34,197,94,0.3)}
+.mini-btn.warn{color:var(--warn);border-color:rgba(245,158,11,0.3)}
+
+.empty{padding:50px 20px;text-align:center;color:var(--muted)}
+.empty i{font-size:36px;margin-bottom:12px;color:var(--accent);display:block}
+.empty p{font-size:12px;font-weight:600}
+
+.stars{color:#fbbf24;font-size:13px;letter-spacing:1px}
+.review-text{font-size:12px;color:var(--text-2);line-height:1.6;margin:8px 0;font-weight:500}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(100px);
+  background:var(--surface-3);color:var(--text);
+  padding:12px 20px;border-radius:14px;font-size:13px;font-weight:700;z-index:500;
+  border:1px solid var(--border);box-shadow:var(--shadow);
+  opacity:0;transition:0.4s cubic-bezier(0.2,0,0.2,1);
+  pointer-events:none;text-align:center;max-width:88%;
+}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* LOADING OVERLAY */
+.loading-screen{
+  position:fixed;inset:0;background:var(--bg);z-index:1000;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+}
+.loading-screen i{font-size:44px;color:var(--accent);animation:spin 1s linear infinite}
+@keyframes spin{100%{transform:rotate(360deg)}}
+.loading-screen p{font-size:13px;font-weight:800;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div class="loading-screen" id="loading">
+  <i class="fas fa-fingerprint"></i>
+  <p>Verifying admin access...</p>
+</div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="brand">
+    <div class="logo-slot"><img src="logo.jpeg" alt="KIDD OG STORE" onerror="this.parentElement.innerHTML='<i class=\'fas fa-gamepad\' style=\'color:var(--accent)\'></i>'"></div>
+    <div class="brand-text">
+      <h1>Admin Panel</h1>
+      <p>KIDD OG STORE</p>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="icon-btn" id="themeToggle"><i class="fas fa-sun"></i></button>
+    <a href="index.html" class="icon-btn accent" title="View store"><i class="fas fa-store"></i></a>
+    <button class="icon-btn danger" id="logoutBtn" title="Logout"><i class="fas fa-right-from-bracket"></i></button>
+  </div>
+</header>
+
+<main>
+  <!-- PROFILE -->
+  <div class="profile" id="profile">
+    <div class="profile-avatar" id="avatar">A</div>
+    <div class="profile-info">
+      <h2 id="profileName">Loading...</h2>
+      <div class="email" id="profileEmail">—</div>
+      <span class="role-badge"><i class="fas fa-shield-halved"></i> Full Admin</span>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-tab="upload"><i class="fas fa-plus-circle"></i> Upload</button>
+    <button class="tab" data-tab="products"><i class="fas fa-box"></i> Accounts</button>
+    <button class="tab" data-tab="reviews"><i class="fas fa-star"></i> Reviews</button>
+    <button class="tab" data-tab="settings"><i class="fas fa-cog"></i> Settings</button>
+  </div>
+
+  <!-- PANEL: UPLOAD -->
+  <div class="panel active" id="panel-upload">
+    <div class="card">
+      <div class="card-title"><i class="fas fa-cloud-arrow-up"></i> <span id="formTitle">Upload New Account</span></div>
+      <p class="card-sub" id="formSub">Fill in the details below. Add images and/or videos.</p>
+
+      <input type="hidden" id="editId">
+
+      <label class="form-label">Account Name</label>
+      <input type="text" class="form-input" id="pName" placeholder="e.g. Mythic Free Fire Account — Level 65">
+
+      <label class="form-label">Description</label>
+      <textarea class="form-textarea" id="pDesc" placeholder="Describe the account: skins, level, rank, heroes, etc."></textarea>
+
+      <div class="form-row">
+        <div>
+          <label class="form-label">Price (₦)</label>
+          <input type="number" class="form-input" id="pPrice" placeholder="45000" min="0">
+        </div>
+        <div>
+          <label class="form-label">Old Price (optional)</label>
+          <input type="number" class="form-input" id="pOldPrice" placeholder="60000" min="0">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div>
+          <label class="form-label">Category</label>
+          <select class="form-select" id="pCategory">
+            <option value="Free Fire">Free Fire</option>
+            <option value="Call of Duty">Call of Duty</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Tag (optional)</label>
+          <select class="form-select" id="pTag">
+            <option value="">— None —</option>
+            <option value="NEW">NEW</option>
+            <option value="HOT">HOT</option>
+            <option value="RARE">RARE</option>
+            <option value="SALE">SALE</option>
+            <option value="LIMITED">LIMITED</option>
+          </select>
+        </div>
+      </div>
+
+      <label class="form-label">Media Gallery (images & videos)</label>
+      <div class="upload-zone" id="uploadZone">
+        <i class="fas fa-images"></i>
+        <p>Tap to upload images or videos</p>
+        <small>Images: JPG, PNG, WEBP · Videos: MP4, MOV</small>
+        <input type="file" id="fileInput" accept="image/*,video/*" multiple>
+      </div>
+      <div class="media-grid" id="mediaGrid"></div>
+
+      <div class="form-row">
+        <div>
+          <label class="form-label">Mark as Sold</label>
+          <select class="form-select" id="pSold">
+            <option value="false">No — Available</option>
+            <option value="true">Yes — Sold</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Featured</label>
+          <select class="form-select" id="pFeatured">
+            <option value="false">No</option>
+            <option value="true">Yes — Pin to top</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="saveProductBtn"><i class="fas fa-cloud-arrow-up"></i> Publish Account</button>
+      <button class="btn btn-ghost" id="cancelEditBtn" style="display:none;margin-top:8px"><i class="fas fa-times"></i> Cancel Edit</button>
+    </div>
+  </div>
+
+  <!-- PANEL: PRODUCTS -->
+  <div class="panel" id="panel-products">
+    <div class="card">
+      <div class="card-title"><i class="fas fa-box"></i> Manage Accounts</div>
+      <p class="card-sub" id="productsCount">Loading...</p>
+      <div id="productsList"></div>
+    </div>
+  </div>
+
+  <!-- PANEL: REVIEWS -->
+  <div class="panel" id="panel-reviews">
+    <div class="card">
+      <div class="card-title"><i class="fas fa-star"></i> Review Manager</div>
+      <p class="card-sub">Approve or delete reviews. Approve only real ones.</p>
+      <button class="btn btn-warn" id="clearDemoBtn" style="margin-bottom:16px">
+        <i class="fas fa-broom"></i> Clear Demo Reviews (storefront)
+      </button>
+      <div id="reviewsList"></div>
+    </div>
+  </div>
+
+  <!-- PANEL: SETTINGS -->
+  <div class="panel" id="panel-settings">
+    <div class="card">
+      <div class="card-title"><i class="fas fa-cog"></i> Store Settings</div>
+      <p class="card-sub">Configure your store. Changes take effect on reload.</p>
+
+      <label class="form-label">WhatsApp Number (buyers will message this)</label>
+      <input type="text" class="form-input" id="setWA" placeholder="2348025237817">
+
+      <button class="btn btn-primary" id="saveSettingsBtn"><i class="fas fa-save"></i> Save Settings</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><i class="fas fa-triangle-exclamation" style="color:var(--danger)"></i> Danger Zone</div>
+      <p class="card-sub">These actions cannot be undone.</p>
+      <button class="btn btn-danger" id="logoutDangerBtn"><i class="fas fa-right-from-bracket"></i> Logout</button>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { auth, db } from './firebase-config.js';
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+import {
+  collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+// ============ CONFIG ============
+const ADMINS = [
+  "morireoluwaadewuyi@gmail.com",
+  "joenation98@gmail.com"
+];
+const CLOUD_NAME = "za4q8nqh";
+const UPLOAD_PRESET = "kidd_og_uploads";
+const ADMIN_NAMES = {
+  "morireoluwaadewuyi@gmail.com": "Morireoluwa",
+  "joenation98@gmail.com": "Joseph"
+};
+
+// ============ STATE ============
+let currentUser = null;
+let mediaList = []; // [{type:'image'|'video', url}]
+let allProducts = [];
+let editingId = null;
+
+// ============ ELEMENTS ============
+const $ = id => document.getElementById(id);
+const toastEl = $('toast');
+
+// ============ THEME ============
+const savedTheme = localStorage.getItem('kidd_theme') || 'dark';
+document.documentElement.setAttribute('data-theme', savedTheme);
+$('themeToggle').innerHTML = savedTheme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+$('themeToggle').addEventListener('click', () => {
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('kidd_theme', next);
+  $('themeToggle').innerHTML = next === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+});
+
+// ============ TOAST ============
+function toast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => toastEl.classList.remove('show'), 2400);
+}
+
+// ============ AUTH CHECK ============
+onAuthStateChanged(auth, user => {
+  if (!user){
+    window.location.href = 'login.html';
+    return;
+  }
+  const email = (user.email || '').toLowerCase();
+  if (!ADMINS.includes(email)){
+    toast('Access denied. Redirecting...');
+    setTimeout(() => signOut(auth).then(() => window.location.href = 'index.html'), 1500);
+    return;
+  }
+  currentUser = user;
+  setupUI(email);
+  $('loading').style.display = 'none';
+  loadProducts();
+  loadReviews();
+  loadSettings();
+});
+
+function setupUI(email){
+  const name = ADMIN_NAMES[email] || email.split('@')[0];
+  $('profileName').textContent = name;
+  $('profileEmail').textContent = email;
+  $('avatar').textContent = (name[0] || 'A').toUpperCase();
+}
+
+// ============ LOGOUT ============
+$('logoutBtn').addEventListener('click', doLogout);
+$('logoutDangerBtn').addEventListener('click', doLogout);
+async function doLogout(){
+  if (!confirm('Log out of admin panel?')) return;
+  await signOut(auth);
+  window.location.href = 'login.html';
+}
+
+// ============ TABS ============
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    $('panel-' + t.dataset.tab).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
+
+// ============ CLOUDINARY UPLOAD ============
+async function uploadToCloudinary(file){
+  const url = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`;
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('upload_preset', UPLOAD_PRESET);
+  const res = await fetch(url, { method: 'POST', body: fd });
+  if (!res.ok){
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || 'Upload failed');
+  }
+  const data = await res.json();
+  return {
+    type: data.resource_type === 'video' ? 'video' : 'image',
+    url: data.secure_url
+  };
+}
+
+// ============ MEDIA ============
+$('uploadZone').addEventListener('click', () => $('fileInput').click());
+$('fileInput').addEventListener('change', async e => {
+  const files = Array.from(e.target.files || []);
+  if (!files.length) return;
+  toast(`Uploading ${files.length} file${files.length > 1 ? 's' : ''}...`);
+  for (const f of files){
+    try {
+      const item = await uploadToCloudinary(f);
+      mediaList.push(item);
+    } catch(err){
+      toast('❌ ' + err.message);
+    }
+  }
+  renderMediaGrid();
+  e.target.value = '';
+});
+
+function renderMediaGrid(){
+  const g = $('mediaGrid');
+  if (mediaList.length === 0){ g.innerHTML = ''; return; }
+  g.innerHTML = mediaList.map((m, i) => {
+    const preview = m.type === 'video'
+      ? `<video src="${m.url}" muted></video>`
+      : `<img src="${m.url}" alt="">`;
+    return `
+      <div class="media-item">
+        <button class="remove" data-idx="${i}"><i class="fas fa-times"></i></button>
+        <div class="type-badge">${m.type === 'video' ? 'VIDEO' : 'IMG'}</div>
+        ${preview}
+      </div>
+    `;
+  }).join('');
+  g.querySelectorAll('.remove').forEach(b => {
+    b.addEventListener('click', () => {
+      mediaList.splice(Number(b.dataset.idx), 1);
+      renderMediaGrid();
+    });
+  });
+}
+
+// ============ SAVE PRODUCT ============
+$('saveProductBtn').addEventListener('click', async () => {
+  const btn = $('saveProductBtn');
+  const name = $('pName').value.trim();
+  const description = $('pDesc').value.trim();
+  const price = Number($('pPrice').value);
+  const oldPrice = $('pOldPrice').value ? Number($('pOldPrice').value) : null;
+  const category = $('pCategory').value;
+  const tag = $('pTag').value;
+  const isSold = $('pSold').value === 'true';
+  const isFeatured = $('pFeatured').value === 'true';
+
+  if (!name) return toast('Please enter account name');
+  if (!description) return toast('Please enter a description');
+  if (!price || price <= 0) return toast('Please enter a valid price');
+  if (mediaList.length === 0) return toast('Please upload at least one image or video');
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+  const data = {
+    name, description, price, oldPrice, category, tag: tag || null,
+    media: mediaList,
+    isSold, isFeatured,
+    updatedAt: serverTimestamp()
+  };
+
+  try {
+    if (editingId){
+      await updateDoc(doc(db, 'products', editingId), data);
+      toast('✅ Account updated');
+    } else {
+      data.createdAt = serverTimestamp();
+      await addDoc(collection(db, 'products'), data);
+      toast('✅ Account published');
+    }
+    resetForm();
+    loadProducts();
+    document.querySelector('.tab[data-tab="products"]').click();
+  } catch(err){
+    console.error(err);
+    toast('❌ Failed: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = editingId
+      ? '<i class="fas fa-save"></i> Update Account'
+      : '<i class="fas fa-cloud-arrow-up"></i> Publish Account';
+  }
+});
+
+$('cancelEditBtn').addEventListener('click', () => { resetForm(); });
+
+function resetForm(){
+  editingId = null;
+  mediaList = [];
+  $('editId').value = '';
+  $('pName').value = '';
+  $('pDesc').value = '';
+  $('pPrice').value = '';
+  $('pOldPrice').value = '';
+  $('pCategory').value = 'Free Fire';
+  $('pTag').value = '';
+  $('pSold').value = 'false';
+  $('pFeatured').value = 'false';
+  $('formTitle').textContent = 'Upload New Account';
+  $('formSub').textContent = 'Fill in the details below. Add images and/or videos.';
+  $('saveProductBtn').innerHTML = '<i class="fas fa-cloud-arrow-up"></i> Publish Account';
+  $('cancelEditBtn').style.display = 'none';
+  renderMediaGrid();
+}
+
+// ============ LOAD PRODUCTS ============
+async function loadProducts(){
+  const list = $('productsList');
+  list.innerHTML = '<div class="empty"><i class="fas fa-spinner fa-spin"></i><p>Loading accounts...</p></div>';
+  try {
+    const snap = await getDocs(collection(db, 'products'));
+    allProducts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    allProducts.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+    renderProducts();
+  } catch(err){
+    list.innerHTML = '<div class="empty"><i class="fas fa-triangle-exclamation"></i><p>Could not load accounts.</p></div>';
+  }
+}
+
+function renderProducts(){
+  const list = $('productsList');
+  $('productsCount').textContent = `${allProducts.length} account${allProducts.length === 1 ? '' : 's'} in store`;
+
+  if (allProducts.length === 0){
+    list.innerHTML = '<div class="empty"><i class="fas fa-box-open"></i><p>No accounts yet. Upload your first one!</p></div>';
+    return;
+  }
+
+  list.innerHTML = allProducts.map(p => {
+    const first = p.media?.[0];
+    const thumb = first
+      ? (first.type === 'video'
+          ? `<video src="${first.url}" muted></video>`
+          : `<img src="${first.url}" alt="">`)
+      : '<i class="fas fa-gamepad"></i>';
+    const oldP = p.oldPrice ? `<s>₦${Number(p.oldPrice).toLocaleString()}</s>` : '';
+    const sold = p.isSold ? '<span class="badge badge-sold">SOLD</span>' : '';
+    const feat = p.isFeatured ? '<span class="badge badge-feat">FEATURED</span>' : '';
+    const mediaCount = (p.media || []).length;
+
+    return `
+      <div class="item">
+        <div class="item-thumb">${thumb}</div>
+        <div class="item-body">
+          <div class="item-name">${escapeHtml(p.name)}</div>
+          <div class="item-meta">
+            <span>${escapeHtml(p.category || 'Game')}</span>
+            <span>${mediaCount} media</span>
+            ${sold}${feat}
+          </div>
+          <div class="item-price">₦${Number(p.price || 0).toLocaleString()} ${oldP}</div>
+          <div class="item-actions">
+            <button class="mini-btn" data-edit="${p.id}"><i class="fas fa-pen"></i> Edit</button>
+            <button class="mini-btn warn" data-sold="${p.id}"><i class="fas fa-check-circle"></i> ${p.isSold ? 'Mark Available' : 'Mark Sold'}</button>
+            <button class="mini-btn warn" data-feat="${p.id}"><i class="fas fa-star"></i> ${p.isFeatured ? 'Unpin' : 'Pin'}</button>
+            <button class="mini-btn danger" data-del="${p.id}"><i class="fas fa-trash"></i> Delete</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  list.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => editProduct(b.dataset.edit)));
+  list.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => delProduct(b.dataset.del)));
+  list.querySelectorAll('[data-sold]').forEach(b => b.addEventListener('click', () => toggleField(b.dataset.sold, 'isSold')));
+  list.querySelectorAll('[data-feat]').forEach(b => b.addEventListener('click', () => toggleField(b.dataset.feat, 'isFeatured')));
+}
+
+function editProduct(id){
+  const p = allProducts.find(x => x.id === id); if (!p) return;
+  editingId = id;
+  mediaList = Array.isArray(p.media) ? [...p.media] : [];
+  $('pName').value = p.name || '';
+  $('pDesc').value = p.description || '';
+  $('pPrice').value = p.price || '';
+  $('pOldPrice').value = p.oldPrice || '';
+  $('pCategory').value = p.category || 'Free Fire';
+  $('pTag').value = p.tag || '';
+  $('pSold').value = p.isSold ? 'true' : 'false';
+  $('pFeatured').value = p.isFeatured ? 'true' : 'false';
+  $('formTitle').textContent = 'Edit Account';
+  $('formSub').textContent = 'Update the details below.';
+  $('saveProductBtn').innerHTML = '<i class="fas fa-save"></i> Update Account';
+  $('cancelEditBtn').style.display = 'flex';
+  renderMediaGrid();
+  document.querySelector('.tab[data-tab="upload"]').click();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function delProduct(id){
+  if (!confirm('Delete this account permanently?')) return;
+  try {
+    await deleteDoc(doc(db, 'products', id));
+    toast('🗑️ Deleted');
+    loadProducts();
+  } catch(err){ toast('❌ ' + err.message); }
+}
+
+async function toggleField(id, field){
+  const p = allProducts.find(x => x.id === id); if (!p) return;
+  try {
+    await updateDoc(doc(db, 'products', id), { [field]: !p[field] });
+    toast('✅ Updated');
+    loadProducts();
+  } catch(err){ toast('❌ ' + err.message); }
+}
+
+// ============ REVIEWS ============
+async function loadReviews(){
+  const list = $('reviewsList');
+  list.innerHTML = '<div class="empty"><i class="fas fa-spinner fa-spin"></i><p>Loading reviews...</p></div>';
+  try {
+    const snap = await getDocs(collection(db, 'reviews'));
+    const reviews = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    reviews.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+    renderReviews(reviews);
+  } catch(err){
+    list.innerHTML = '<div class="empty"><i class="fas fa-triangle-exclamation"></i><p>Could not load reviews.</p></div>';
+  }
+}
+
+function renderReviews(reviews){
+  const list = $('reviewsList');
+  if (reviews.length === 0){
+    list.innerHTML = '<div class="empty"><i class="fas fa-comment-dots"></i><p>No reviews yet.</p></div>';
+    return;
+  }
+  list.innerHTML = reviews.map(r => {
+    const stars = '★'.repeat(Number(r.rating) || 0) + '☆'.repeat(5 - (Number(r.rating) || 0));
+    const status = r.status === 'approved'
+      ? '<span class="badge badge-approved">APPROVED</span>'
+      : '<span class="badge badge-pending">PENDING</span>';
+    const approveBtn = r.status === 'approved' ? '' :
+      `<button class="mini-btn success" data-approve="${r.id}"><i class="fas fa-check"></i> Approve</button>`;
+    return `
+      <div class="item">
+        <div class="item-body">
+          <div class="item-name">${escapeHtml(r.name)} ${status}</div>
+          <div class="item-meta"><span>${escapeHtml(r.phone || '')}</span></div>
+          <div class="stars">${stars}</div>
+          <div class="review-text">${escapeHtml(r.text)}</div>
+          <div class="item-actions">
+            ${approveBtn}
+            <button class="mini-btn danger" data-delrev="${r.id}"><i class="fas fa-trash"></i> Delete</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  list.querySelectorAll('[data-approve]').forEach(b => b.addEventListener('click', () => approveReview(b.dataset.approve)));
+  list.querySelectorAll('[data-delrev]').forEach(b => b.addEventListener('click', () => delReview(b.dataset.delrev)));
+}
+
+async function approveReview(id){
+  try {
+    await updateDoc(doc(db, 'reviews', id), { status: 'approved' });
+    toast('✅ Review approved');
+    loadReviews();
+  } catch(err){ toast('❌ ' + err.message); }
+}
+async function delReview(id){
+  if (!confirm('Delete this review?')) return;
+  try {
+    await deleteDoc(doc(db, 'reviews', id));
+    toast('🗑️ Review deleted');
+    loadReviews();
+  } catch(err){ toast('❌ ' + err.message); }
+}
+
+// Clear demo reviews on storefront (removes flag from localStorage)
+$('clearDemoBtn').addEventListener('click', () => {
+  if (!confirm('Hide demo reviews from storefront?\n\nReal approved reviews will still show.')) return;
+  localStorage.setItem('kidd_hide_demo', 'true');
+  toast('✅ Demo reviews will now be hidden on storefront');
+});
+
+// ============ SETTINGS ============
+function loadSettings(){
+  $('setWA').value = localStorage.getItem('kidd_wa') || '2348025237817';
+}
+$('saveSettingsBtn').addEventListener('click', () => {
+  const wa = $('setWA').value.trim().replace(/\D/g, '');
+  if (!wa || wa.length < 10) return toast('Enter a valid WhatsApp number');
+  localStorage.setItem('kidd_wa', wa);
+  toast('✅ Settings saved (reload storefront to apply)');
+});
+
+// ============ UTILS ============
+function escapeHtml(s){
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+</script>
+</body>
+</html>
