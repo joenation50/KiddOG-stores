@@ -74,7 +74,6 @@ main,header{position:relative;z-index:1}
 .code-input-wrap{position:relative}
 .code-input-wrap .form-input{font-family:monospace;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding-right:90px}
 .regen-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:var(--accent-soft);color:var(--accent);border:none;padding:7px 12px;border-radius:8px;font-size:10px;font-weight:900;cursor:pointer;font-family:inherit}
-.regen-btn:active{transform:translateY(-50%) scale(0.95)}
 
 .upload-zone{border:2px dashed var(--border);border-radius:16px;padding:22px;text-align:center;cursor:pointer;transition:0.2s;background:var(--surface-2);margin-bottom:14px}
 .upload-zone:hover{border-color:var(--accent);background:var(--accent-soft)}
@@ -96,7 +95,6 @@ main,header{position:relative;z-index:1}
 :root[data-theme="light"] .btn-primary{color:#fff}
 .btn-danger{background:var(--danger);color:#fff}
 .btn-warn{background:var(--warn);color:#fff}
-.btn-success{background:var(--success);color:#fff}
 .btn-ghost{background:var(--surface-2);color:var(--text);border:1px solid var(--border)}
 
 .search-bar{position:relative;margin-bottom:16px}
@@ -140,6 +138,9 @@ main,header{position:relative;z-index:1}
 .loading-screen i{font-size:44px;color:var(--accent);animation:spin 1s linear infinite}
 @keyframes spin{100%{transform:rotate(360deg)}}
 .loading-screen p{font-size:13px;font-weight:800;color:var(--muted)}
+
+.settings-grid{display:grid;gap:10px}
+.hint-text{font-size:10px;color:var(--muted);font-weight:500;margin-top:-8px;margin-bottom:12px;line-height:1.5}
 </style>
 </head>
 <body>
@@ -270,7 +271,7 @@ main,header{position:relative;z-index:1}
       <p class="card-sub" id="productsCount">Loading...</p>
       <div class="search-bar">
         <i class="fas fa-search s-icon"></i>
-        <input type="text" id="adminSearch" placeholder="Search by code (KOG-FF-001), name or category...">
+        <input type="text" id="adminSearch" placeholder="Search by code, name or category...">
         <i class="fas fa-times-circle s-clear" id="adminSearchClear"></i>
       </div>
       <div id="productsList"></div>
@@ -291,11 +292,24 @@ main,header{position:relative;z-index:1}
   <div class="panel" id="panel-settings">
     <div class="card">
       <div class="card-title"><i class="fas fa-cog"></i> Store Settings</div>
-      <p class="card-sub">Configure your store. Changes take effect on reload.</p>
-      <label class="form-label">WhatsApp Number (buyers message this)</label>
+      <p class="card-sub">Save once. Storefront reads these on every load.</p>
+
+      <label class="form-label">WhatsApp Number</label>
       <input type="text" class="form-input" id="setWA" placeholder="2348025237817">
+      <p class="hint-text">Include country code, no + or spaces. e.g. 2348025237817</p>
+
+      <label class="form-label">Instagram URL</label>
+      <input type="url" class="form-input" id="setIG" placeholder="https://instagram.com/kiddogstore">
+
+      <label class="form-label">TikTok URL</label>
+      <input type="url" class="form-input" id="setTT" placeholder="https://tiktok.com/@kiddogstore">
+
+      <label class="form-label">Telegram URL</label>
+      <input type="url" class="form-input" id="setTG" placeholder="https://t.me/kiddogstore">
+
       <button class="btn btn-primary" id="saveSettingsBtn"><i class="fas fa-save"></i> Save Settings</button>
     </div>
+
     <div class="card">
       <div class="card-title"><i class="fas fa-triangle-exclamation" style="color:var(--danger)"></i> Danger Zone</div>
       <p class="card-sub">Logout of the admin panel.</p>
@@ -345,7 +359,12 @@ onAuthStateChanged(auth, user => {
   currentUser = user;
   setupUI(email);
   $('loading').style.display = 'none';
-  loadProducts();
+  loadProducts().then(async () => {
+    // Set initial code after products load
+    if (!editingId && !$('pCode').value){
+      $('pCode').value = await generateCode($('pCategory').value);
+    }
+  });
   loadReviews();
   loadSettings();
 });
@@ -371,13 +390,12 @@ document.querySelectorAll('.tab').forEach(t => {
   });
 });
 
-// ===== CODE GENERATION =====
+// ===== CODE GEN =====
 function categoryPrefix(cat){
   if (cat === 'Free Fire') return 'FF';
   if (cat === 'Call of Duty') return 'COD';
   return 'OTH';
 }
-
 async function generateCode(category){
   const prefix = categoryPrefix(category);
   let max = 0;
@@ -386,21 +404,15 @@ async function generateCode(category){
     const m = c.match(new RegExp('^KOG-' + prefix + '-(\\d+)$'));
     if (m) max = Math.max(max, parseInt(m[1]));
   });
-  const next = String(max + 1).padStart(3, '0');
-  return `KOG-${prefix}-${next}`;
+  return `KOG-${prefix}-${String(max + 1).padStart(3, '0')}`;
 }
 
-$('regenCodeBtn').addEventListener('click', async () => {
-  const cat = $('pCategory').value;
-  $('pCode').value = await generateCode(cat);
-});
-
+$('regenCodeBtn').addEventListener('click', async () => { $('pCode').value = await generateCode($('pCategory').value); });
 $('pCategory').addEventListener('change', async () => {
-  if (!editingId){
-    $('pCode').value = await generateCode($('pCategory').value);
-  }
+  if (!editingId){ $('pCode').value = await generateCode($('pCategory').value); }
 });
 
+// ===== CLOUDINARY =====
 async function uploadToCloudinary(file){
   const url = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`;
   const fd = new FormData();
@@ -455,7 +467,6 @@ $('saveProductBtn').addEventListener('click', async () => {
   if (!price || price <= 0) return toast('Please enter a valid price');
   if (mediaList.length === 0) return toast('Please upload at least one image or video');
 
-  // Duplicate code check
   const dup = allProducts.find(p => (p.code || '').toUpperCase() === code && p.id !== editingId);
   if (dup) return toast('❌ Code already in use');
 
@@ -467,8 +478,8 @@ $('saveProductBtn').addEventListener('click', async () => {
   try {
     if (editingId){ await updateDoc(doc(db, 'products', editingId), data); toast('✅ Account updated'); }
     else { data.createdAt = serverTimestamp(); await addDoc(collection(db, 'products'), data); toast('✅ Account published'); }
-    resetForm();
-    loadProducts();
+    await resetForm();
+    await loadProducts();
     document.querySelector('.tab[data-tab="products"]').click();
   } catch(err){ console.error(err); toast('❌ Failed: ' + err.message); }
   finally { btn.disabled = false; btn.innerHTML = editingId ? '<i class="fas fa-save"></i> Update Account' : '<i class="fas fa-cloud-arrow-up"></i> Publish Account'; }
@@ -544,7 +555,7 @@ function renderProducts(){
           <div class="item-price">₦${Number(p.price || 0).toLocaleString()} ${oldP}</div>
           <div class="item-actions">
             <button class="mini-btn" data-edit="${p.id}"><i class="fas fa-pen"></i> Edit</button>
-            <button class="mini-btn warn" data-sold="${p.id}"><i class="fas fa-check-circle"></i> ${p.isSold ? 'Mark Available' : 'Mark Sold'}</button>
+            <button class="mini-btn warn" data-sold="${p.id}"><i class="fas fa-check-circle"></i> ${p.isSold ? 'Available' : 'Mark Sold'}</button>
             <button class="mini-btn warn" data-feat="${p.id}"><i class="fas fa-star"></i> ${p.isFeatured ? 'Unpin' : 'Pin'}</button>
             <button class="mini-btn" data-copy="${escapeHtml(p.code || '')}"><i class="fas fa-copy"></i> Copy Code</button>
             <button class="mini-btn danger" data-del="${p.id}"><i class="fas fa-trash"></i> Delete</button>
@@ -608,6 +619,7 @@ async function toggleField(id, field){
   catch(err){ toast('❌ ' + err.message); }
 }
 
+// ===== REVIEWS =====
 async function loadReviews(){
   const list = $('reviewsList');
   list.innerHTML = '<div class="empty"><i class="fas fa-spinner fa-spin"></i><p>Loading reviews...</p></div>';
@@ -654,24 +666,25 @@ $('clearDemoBtn').addEventListener('click', () => {
   toast('✅ Demo reviews will now be hidden on storefront');
 });
 
-function loadSettings(){ $('setWA').value = localStorage.getItem('kidd_wa') || '2348025237817'; }
+// ===== SETTINGS =====
+function loadSettings(){
+  $('setWA').value = localStorage.getItem('kidd_wa') || '2348025237817';
+  $('setIG').value = localStorage.getItem('kidd_social_instagram') || '';
+  $('setTT').value = localStorage.getItem('kidd_social_tiktok') || '';
+  $('setTG').value = localStorage.getItem('kidd_social_telegram') || '';
+}
+
 $('saveSettingsBtn').addEventListener('click', () => {
   const wa = $('setWA').value.trim().replace(/\D/g, '');
   if (!wa || wa.length < 10) return toast('Enter a valid WhatsApp number');
   localStorage.setItem('kidd_wa', wa);
-  toast('✅ Settings saved (reload storefront to apply)');
+  localStorage.setItem('kidd_social_instagram', $('setIG').value.trim());
+  localStorage.setItem('kidd_social_tiktok', $('setTT').value.trim());
+  localStorage.setItem('kidd_social_telegram', $('setTG').value.trim());
+  toast('✅ Settings saved');
 });
 
 function escapeHtml(s){ if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
-
-// Initial code gen on load
-window.addEventListener('load', async () => {
-  setTimeout(async () => {
-    if (!editingId && !$('pCode').value){
-      $('pCode').value = await generateCode('Free Fire');
-    }
-  }, 1500);
-});
 </script>
 </body>
 </html>
