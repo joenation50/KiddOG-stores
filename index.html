@@ -32,6 +32,7 @@ html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;padding-bottom:90px;overflow-x:hidden;transition:background 0.35s ease,color 0.35s ease;position:relative}
 body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(600px circle at 10% 0%,var(--bg-glow-1),transparent 45%),radial-gradient(600px circle at 90% 30%,var(--bg-glow-2),transparent 45%)}
 main,header,footer{position:relative;z-index:1}
+body.modal-open{overflow:hidden}
 
 .header{position:sticky;top:0;z-index:100;background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border-soft);padding:12px 18px;display:flex;align-items:center;justify-content:space-between}
 .brand{display:flex;align-items:center;gap:12px}
@@ -85,7 +86,7 @@ main,header,footer{position:relative;z-index:1}
 @media(min-width:640px){.grid{grid-template-columns:repeat(3,1fr)}}
 @media(min-width:900px){.grid{grid-template-columns:repeat(4,1fr)}}
 
-.card{background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;transition:0.25s cubic-bezier(0.2,0,0.2,1);animation:fadeUp 0.5s ease backwards;position:relative}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;transition:0.25s cubic-bezier(0.2,0,0.2,1);animation:fadeUp 0.5s ease backwards;position:relative;cursor:pointer}
 .card:hover{transform:translateY(-4px);border-color:var(--accent);box-shadow:var(--shadow-accent)}
 .card:active{transform:scale(0.97)}
 .card.sold{opacity:0.65}
@@ -93,6 +94,7 @@ main,header,footer{position:relative;z-index:1}
 .card-img img,.card-img video{width:100%;height:100%;object-fit:cover;transition:0.4s}
 .card:hover .card-img img{transform:scale(1.06)}
 .card-img .ph{color:var(--muted);font-size:32px}
+.card-media-count{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.7);color:#fff;font-size:9px;font-weight:900;padding:3px 8px;border-radius:8px;letter-spacing:0.5px;backdrop-filter:blur(4px);z-index:2}
 .card-badge{position:absolute;top:8px;left:8px;background:var(--grad);color:#000;font-size:9px;font-weight:900;padding:4px 9px;border-radius:8px;letter-spacing:0.5px;text-transform:uppercase;z-index:2}
 :root[data-theme="light"] .card-badge{color:#fff}
 .card-discount{position:absolute;top:8px;left:8px;background:var(--danger);color:#fff;font-size:9px;font-weight:900;padding:4px 9px;border-radius:8px;letter-spacing:0.5px;z-index:2}
@@ -113,6 +115,56 @@ main,header,footer{position:relative;z-index:1}
 .card-btn:active{transform:scale(0.95)}
 .card-btn i{font-size:13px}
 .card-btn:disabled{opacity:0.5;cursor:not-allowed}
+
+/* PRODUCT DETAIL MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(5,7,13,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:1000;justify-content:flex-end;align-items:flex-end;animation:fadeIn 0.2s ease}
+.modal-overlay.open{display:flex}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.detail-sheet{background:var(--bg);width:100%;max-width:680px;max-height:94vh;border-radius:28px 28px 0 0;display:flex;flex-direction:column;animation:slideUp 0.35s cubic-bezier(0.16,1,0.3,1);overflow:hidden;box-shadow:0 -10px 60px rgba(0,0,0,0.5);position:relative}
+@media(min-width:640px){.modal-overlay{justify-content:center;align-items:center;padding:20px}.detail-sheet{border-radius:24px;max-height:90vh;max-width:640px}}
+@keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+.detail-close{position:absolute;top:14px;right:14px;z-index:10;width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,0.6);backdrop-filter:blur(10px);border:none;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.detail-close:active{transform:scale(0.9)}
+.detail-scroll{overflow-y:auto;flex:1;padding-bottom:24px}
+
+.gallery{position:relative;width:100%;aspect-ratio:1;background:var(--surface-2);overflow:hidden}
+@media(min-width:640px){.gallery{aspect-ratio:16/10}}
+.gallery-track{display:flex;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.gallery-track::-webkit-scrollbar{display:none}
+.gallery-item{flex-shrink:0;width:100%;height:100%;scroll-snap-align:center;display:flex;align-items:center;justify-content:center;background:#000}
+.gallery-item img,.gallery-item video{width:100%;height:100%;object-fit:contain}
+.gallery-item .ph{font-size:52px;color:var(--muted)}
+.gallery-dots{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);padding:6px 10px;border-radius:20px;z-index:2}
+.gallery-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.4)}
+.gallery-dot.active{background:#fff;width:18px;border-radius:3px}
+.gallery-badge{position:absolute;top:14px;left:14px;background:var(--grad);color:#000;font-size:10px;font-weight:900;padding:5px 10px;border-radius:9px;letter-spacing:0.5px;text-transform:uppercase;z-index:2}
+:root[data-theme="light"] .gallery-badge{color:#fff}
+.gallery-sold{position:absolute;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;font-weight:900;letter-spacing:4px;text-transform:uppercase;z-index:3}
+
+.detail-body{padding:22px 20px 20px}
+.detail-code{font-size:11px;font-weight:900;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;background:var(--accent-soft);display:inline-block;padding:5px 11px;border-radius:8px;font-family:monospace;margin-bottom:12px}
+.detail-title{font-size:22px;font-weight:900;line-height:1.25;letter-spacing:-0.5px;margin-bottom:8px}
+.detail-cat{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:16px}
+.detail-cat i{color:var(--accent)}
+
+.detail-price-box{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:18px;display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.detail-price{font-size:28px;font-weight:900;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.detail-old-price{font-size:14px;color:var(--muted);font-weight:700;text-decoration:line-through}
+.detail-discount-tag{background:var(--danger);color:#fff;font-size:10px;font-weight:900;padding:4px 9px;border-radius:7px;letter-spacing:0.5px}
+
+.detail-section-title{font-size:11px;font-weight:900;color:var(--text-2);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.detail-section-title i{color:var(--accent);font-size:12px}
+.detail-desc{font-size:14px;color:var(--text-2);line-height:1.7;font-weight:500;margin-bottom:22px;white-space:pre-wrap;word-break:break-word}
+
+.detail-features{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:22px}
+.feature-chip{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-size:11px;font-weight:700;color:var(--text-2)}
+.feature-chip i{color:var(--accent);font-size:12px}
+
+.detail-cta{position:sticky;bottom:0;background:linear-gradient(to top,var(--bg) 70%,transparent);padding:16px 0 0;margin-top:8px}
+.detail-wa-btn{width:100%;padding:16px;border:none;border-radius:16px;background:var(--wa);color:#fff;font-family:inherit;font-size:15px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;transition:0.2s;box-shadow:0 8px 24px rgba(37,211,102,0.35)}
+.detail-wa-btn:active{transform:scale(0.97)}
+.detail-wa-btn i{font-size:18px}
+.detail-wa-btn:disabled{background:var(--muted);box-shadow:none;cursor:not-allowed}
 
 .state{padding:70px 20px;text-align:center;color:var(--muted)}
 .state i{font-size:38px;margin-bottom:16px;color:var(--accent);display:block}
@@ -169,7 +221,7 @@ main,header,footer{position:relative;z-index:1}
 .footer-socials a{width:36px;height:36px;border-radius:10px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-2);text-decoration:none;font-size:14px;transition:0.2s}
 .footer-socials a:active{transform:scale(0.9);color:var(--accent)}
 
-.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--surface-3);color:var(--text);padding:12px 20px;border-radius:14px;font-size:13px;font-weight:700;z-index:200;border:1px solid var(--border);box-shadow:var(--shadow);opacity:0;transition:0.4s cubic-bezier(0.2,0,0.2,1);pointer-events:none;text-align:center;max-width:88%}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--surface-3);color:var(--text);padding:12px 20px;border-radius:14px;font-size:13px;font-weight:700;z-index:2000;border:1px solid var(--border);box-shadow:var(--shadow);opacity:0;transition:0.4s cubic-bezier(0.2,0,0.2,1);pointer-events:none;text-align:center;max-width:88%}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 </style>
 </head>
@@ -273,6 +325,14 @@ main,header,footer{position:relative;z-index:1}
   </section>
 </main>
 
+<!-- PRODUCT DETAIL MODAL -->
+<div class="modal-overlay" id="detailModal">
+  <div class="detail-sheet">
+    <button class="detail-close" id="detailClose"><i class="fas fa-times"></i></button>
+    <div class="detail-scroll" id="detailScroll"></div>
+  </div>
+</div>
+
 <a href="#" id="floatWA" class="float-wa" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
   <i class="fab fa-whatsapp"></i>
 </a>
@@ -281,11 +341,8 @@ main,header,footer{position:relative;z-index:1}
   <div class="footer-logo"><img src="logo.jpeg" alt="KIDD OG STORE" onerror="this.style.display='none';this.parentElement.innerHTML='K'"></div>
   <h3>KIDD OG STORE</h3>
   <p>Premium gaming accounts, delivered instantly.<br>© 2025 KIDD OG STORE · All rights reserved.</p>
-  <div class="footer-socials">
-    <a href="#" id="footWA" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i></a>
-    <a href="#" onclick="return false"><i class="fab fa-instagram"></i></a>
-    <a href="#" onclick="return false"><i class="fab fa-tiktok"></i></a>
-    <a href="#" onclick="return false"><i class="fab fa-telegram"></i></a>
+  <div class="footer-socials" id="footerSocials">
+    <!-- populated by JS -->
   </div>
 </footer>
 
@@ -295,11 +352,34 @@ main,header,footer{position:relative;z-index:1}
 import { db } from './firebase-config.js';
 import { collection, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
+// ===== SETTINGS FROM ADMIN =====
 const SELLER_WA = localStorage.getItem('kidd_wa') || "2348025237817";
 const WA_LINK = `https://wa.me/${SELLER_WA}`;
 document.getElementById('floatWA').href = WA_LINK;
-document.getElementById('footWA').href = WA_LINK;
 
+const SOCIAL = {
+  whatsapp: localStorage.getItem('kidd_social_whatsapp') || WA_LINK,
+  instagram: localStorage.getItem('kidd_social_instagram') || '',
+  tiktok: localStorage.getItem('kidd_social_tiktok') || '',
+  telegram: localStorage.getItem('kidd_social_telegram') || ''
+};
+
+// ===== SOCIAL FOOTER =====
+function renderSocials(){
+  const box = document.getElementById('footerSocials');
+  const items = [];
+  items.push(`<a href="${SOCIAL.whatsapp}" target="_blank" rel="noopener" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>`);
+  if (SOCIAL.instagram) items.push(`<a href="${SOCIAL.instagram}" target="_blank" rel="noopener" title="Instagram"><i class="fab fa-instagram"></i></a>`);
+  else items.push(`<a href="#" onclick="return false" style="opacity:0.4"><i class="fab fa-instagram"></i></a>`);
+  if (SOCIAL.tiktok) items.push(`<a href="${SOCIAL.tiktok}" target="_blank" rel="noopener" title="TikTok"><i class="fab fa-tiktok"></i></a>`);
+  else items.push(`<a href="#" onclick="return false" style="opacity:0.4"><i class="fab fa-tiktok"></i></a>`);
+  if (SOCIAL.telegram) items.push(`<a href="${SOCIAL.telegram}" target="_blank" rel="noopener" title="Telegram"><i class="fab fa-telegram"></i></a>`);
+  else items.push(`<a href="#" onclick="return false" style="opacity:0.4"><i class="fab fa-telegram"></i></a>`);
+  box.innerHTML = items.join('');
+}
+renderSocials();
+
+// ===== DEMO REVIEWS =====
 const SHOW_DEMO = true;
 const DEMO_REVIEWS = [
   { name: "Chidi O.", phone: "0803***4521", rating: 5, text: "Bought a Free Fire account with mythic skins. Delivered in 5 minutes. Legit store 🔥", date: "2025-10-12", isDemo: true },
@@ -331,7 +411,10 @@ const avgRating = document.getElementById('avgRating');
 const avgStars = document.getElementById('avgStars');
 const ratingCount = document.getElementById('ratingCount');
 const starPicker = document.getElementById('starPicker');
+const detailModal = document.getElementById('detailModal');
+const detailScroll = document.getElementById('detailScroll');
 
+// ===== THEME =====
 const savedTheme = localStorage.getItem('kidd_theme') || 'dark';
 document.documentElement.setAttribute('data-theme', savedTheme);
 updateThemeIcon(savedTheme);
@@ -344,8 +427,14 @@ themeToggle.addEventListener('click', () => {
 });
 function updateThemeIcon(theme){ themeToggle.innerHTML = theme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>'; }
 
-search.addEventListener('input', e => { searchTerm = e.target.value.toLowerCase().trim(); searchClear.style.display = searchTerm ? 'block' : 'none'; render(); });
+// ===== SEARCH =====
+search.addEventListener('input', e => {
+  searchTerm = e.target.value.toLowerCase().trim();
+  searchClear.style.display = searchTerm ? 'block' : 'none';
+  render();
+});
 searchClear.addEventListener('click', () => { search.value = ''; searchTerm = ''; searchClear.style.display = 'none'; render(); });
+
 chips.addEventListener('click', e => {
   const btn = e.target.closest('.chip'); if (!btn) return;
   document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
@@ -401,7 +490,6 @@ function render(){
   if (sortMode === 'price-asc') list.sort((a,b) => (a.price||0) - (b.price||0));
   else if (sortMode === 'price-desc') list.sort((a,b) => (b.price||0) - (a.price||0));
   else list.sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
-
   list.sort((a,b) => (b.isFeatured?1:0) - (a.isFeatured?1:0));
 
   resultsCount.textContent = `${list.length} account${list.length === 1 ? '' : 's'}`;
@@ -414,11 +502,8 @@ function render(){
   grid.innerHTML = list.map((p, i) => {
     const first = (p.media && p.media[0]) ? p.media[0] : null;
     let img = `<i class="fas fa-gamepad ph"></i>`;
-    if (first && first.type === 'image'){
-      img = `<img src="${first.url}" alt="${escapeHtml(p.name)}" loading="lazy" onerror="this.style.display='none';this.parentElement.querySelector('.ph').style.display='block'"><i class="fas fa-gamepad ph" style="display:none"></i>`;
-    } else if (first && first.type === 'video'){
-      img = `<video src="${first.url}" muted playsinline preload="metadata"></video>`;
-    }
+    if (first && first.type === 'image') img = `<img src="${first.url}" alt="${escapeHtml(p.name)}" loading="lazy">`;
+    else if (first && first.type === 'video') img = `<video src="${first.url}" muted playsinline preload="metadata"></video>`;
 
     const tag = p.tag ? `<div class="card-badge">${escapeHtml(p.tag)}</div>` : '';
     const discountPct = (p.oldPrice && p.price && p.oldPrice > p.price) ? Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100) : 0;
@@ -429,17 +514,16 @@ function render(){
     const featStar = p.isFeatured ? `<div class="card-feat-star"><i class="fas fa-star"></i></div>` : '';
     const imgClass = p.isFeatured ? 'card-img has-feat' : 'card-img';
     const codeBadge = p.code ? `<div class="card-code">${escapeHtml(p.code)}</div>` : '';
-
-    const msg = encodeURIComponent(
-      `Hi KIDD OG STORE 👋\n\nI want to buy this account:\n\n🔖 Code: ${p.code || 'N/A'}\n🎮 Name: ${p.name}\n📂 Category: ${p.category||'Game'}\n💰 Price: ₦${Number(p.price).toLocaleString()}\n\nIs it still available?`
-    );
+    const mediaCount = (p.media || []).length;
+    const mediaCountBadge = mediaCount > 1 ? `<div class="card-media-count"><i class="fas fa-images"></i> ${mediaCount}</div>` : '';
 
     return `
-      <div class="card ${p.isSold?'sold':''}" style="animation-delay:${i*40}ms">
+      <div class="card ${p.isSold?'sold':''}" style="animation-delay:${i*40}ms" data-id="${p.id}">
         <div class="${imgClass}">
           ${tag}${discountBadge}
           <div class="card-fav ${isFav?'active':''}" data-fav="${p.id}"><i class="fas fa-heart"></i></div>
           ${featStar}
+          ${mediaCountBadge}
           ${soldOverlay}
           ${img}
         </div>
@@ -448,19 +532,19 @@ function render(){
           <div class="card-title">${escapeHtml(p.name)}</div>
           <div class="card-meta"><i class="fas fa-tag"></i> ${escapeHtml(p.category||'Game')}</div>
           <div class="card-price">₦${Number(p.price||0).toLocaleString()} ${oldP}</div>
-          <button class="card-btn" data-buy='${msg}' ${p.isSold?'disabled':''}>
-            <i class="fab fa-whatsapp"></i> ${p.isSold ? 'Sold Out' : 'Buy Now'}
+          <button class="card-btn" ${p.isSold?'disabled':''}>
+            <i class="fas fa-eye"></i> ${p.isSold ? 'Sold Out' : 'View Details'}
           </button>
         </div>
       </div>
     `;
   }).join('');
 
-  grid.querySelectorAll('[data-buy]').forEach(b => {
-    if (b.disabled) return;
-    b.addEventListener('click', () => {
-      const text = b.getAttribute('data-buy');
-      window.open(`https://wa.me/${SELLER_WA}?text=${text}`, '_blank');
+  // Card click → open detail
+  grid.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('[data-fav]')) return;
+      openDetail(card.dataset.id);
     });
   });
   grid.querySelectorAll('[data-fav]').forEach(el => {
@@ -468,12 +552,109 @@ function render(){
   });
 }
 
+// ===== PRODUCT DETAIL =====
+function openDetail(id){
+  const p = allProducts.find(x => x.id === id); if (!p) return;
+
+  const gallery = (p.media && p.media.length > 0) ? p.media : [{ type: 'placeholder', url: '' }];
+  const galleryItems = gallery.map((m, i) => {
+    if (m.type === 'video') return `<div class="gallery-item" data-idx="${i}"><video src="${m.url}" controls playsinline preload="metadata"></video></div>`;
+    if (m.type === 'image') return `<div class="gallery-item" data-idx="${i}"><img src="${m.url}" alt=""></div>`;
+    return `<div class="gallery-item" data-idx="${i}"><i class="fas fa-gamepad ph"></i></div>`;
+  }).join('');
+
+  const dots = gallery.length > 1 ? `<div class="gallery-dots" id="galleryDots">${gallery.map((_, i) => `<div class="gallery-dot ${i===0?'active':''}" data-dot="${i}"></div>`).join('')}</div>` : '';
+
+  const tag = p.tag ? `<div class="gallery-badge">${escapeHtml(p.tag)}</div>` : '';
+  const soldOverlay = p.isSold ? `<div class="gallery-sold">SOLD</div>` : '';
+  const oldPrice = p.oldPrice ? `<span class="detail-old-price">₦${Number(p.oldPrice).toLocaleString()}</span>` : '';
+  const discountPct = (p.oldPrice && p.price && p.oldPrice > p.price) ? Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100) : 0;
+  const discountTag = discountPct ? `<span class="detail-discount-tag">-${discountPct}% OFF</span>` : '';
+
+  const msg = encodeURIComponent(
+    `Hi KIDD OG STORE 👋\n\nI want to buy this account:\n\n🔖 Code: ${p.code || 'N/A'}\n🎮 Name: ${p.name}\n📂 Category: ${p.category||'Game'}\n💰 Price: ₦${Number(p.price).toLocaleString()}\n\nIs it still available?`
+  );
+
+  detailScroll.innerHTML = `
+    <div class="gallery">
+      ${tag}
+      ${soldOverlay}
+      <div class="gallery-track" id="galleryTrack">${galleryItems}</div>
+      ${dots}
+    </div>
+    <div class="detail-body">
+      ${p.code ? `<div class="detail-code">${escapeHtml(p.code)}</div>` : ''}
+      <div class="detail-title">${escapeHtml(p.name)}</div>
+      <div class="detail-cat"><i class="fas fa-tag"></i> ${escapeHtml(p.category || 'Game')}</div>
+
+      <div class="detail-price-box">
+        <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+          <span class="detail-price">₦${Number(p.price||0).toLocaleString()}</span>
+          ${oldPrice}
+        </div>
+        ${discountTag}
+      </div>
+
+      <div class="detail-section-title"><i class="fas fa-align-left"></i> Description</div>
+      <div class="detail-desc">${escapeHtml(p.description || 'No description provided.')}</div>
+
+      <div class="detail-section-title"><i class="fas fa-shield-halved"></i> Why buy from us</div>
+      <div class="detail-features">
+        <div class="feature-chip"><i class="fas fa-bolt"></i> Instant delivery</div>
+        <div class="feature-chip"><i class="fas fa-shield-halved"></i> Verified account</div>
+        <div class="feature-chip"><i class="fas fa-lock"></i> Secure payment</div>
+        <div class="feature-chip"><i class="fas fa-headset"></i> 24/7 support</div>
+      </div>
+
+      <div class="detail-cta">
+        <button class="detail-wa-btn" id="detailBuyBtn" ${p.isSold?'disabled':''}>
+          <i class="fab fa-whatsapp"></i> ${p.isSold ? 'This Account is Sold' : 'Buy on WhatsApp'}
+        </button>
+      </div>
+    </div>
+  `;
+
+  // Buy button
+  const buyBtn = document.getElementById('detailBuyBtn');
+  if (buyBtn && !p.isSold){
+    buyBtn.addEventListener('click', () => {
+      window.open(`https://wa.me/${SELLER_WA}?text=${msg}`, '_blank');
+    });
+  }
+
+  // Gallery dots sync
+  const track = document.getElementById('galleryTrack');
+  const dotsEl = document.getElementById('galleryDots');
+  if (track && dotsEl){
+    track.addEventListener('scroll', () => {
+      const idx = Math.round(track.scrollLeft / track.clientWidth);
+      dotsEl.querySelectorAll('.gallery-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+    });
+  }
+
+  detailModal.classList.add('open');
+  document.body.classList.add('modal-open');
+}
+
+document.getElementById('detailClose').addEventListener('click', closeDetail);
+detailModal.addEventListener('click', e => { if (e.target === detailModal) closeDetail(); });
+function closeDetail(){
+  detailModal.classList.remove('open');
+  document.body.classList.remove('modal-open');
+  setTimeout(() => { detailScroll.innerHTML = ''; }, 300);
+}
+
+// ===== REVIEWS =====
 async function loadReviews(){
+  reviewList.innerHTML = '<div class="state"><i class="fas fa-spinner fa-spin"></i><p>Loading reviews...</p></div>';
   try{
     const snap = await getDocs(collection(db, "reviews"));
     const all = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     approvedReviews = all.filter(r => r.status === 'approved');
-  } catch(err){ console.error(err); approvedReviews = []; }
+  } catch(err){
+    console.error('Reviews load error:', err);
+    approvedReviews = [];
+  }
   renderReviews();
 }
 
@@ -528,11 +709,6 @@ starPicker.addEventListener('click', e => {
   pickedStars = Number(star.dataset.star);
   paintStars(pickedStars, false);
 });
-starPicker.addEventListener('mouseover', e => {
-  const star = e.target.closest('[data-star]'); if (!star) return;
-  paintStars(Number(star.dataset.star), true);
-});
-starPicker.addEventListener('mouseleave', () => paintStars(pickedStars, false));
 function paintStars(n, hover){
   starPicker.querySelectorAll('[data-star]').forEach((el, i) => {
     el.classList.toggle('active', i < n && !hover);
@@ -555,21 +731,29 @@ document.getElementById('submitReview').addEventListener('click', async () => {
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
 
   try {
-    await addDoc(collection(db, "reviews"), { name, phone, rating: pickedStars, text, status: 'pending', createdAt: serverTimestamp() });
+    await addDoc(collection(db, "reviews"), {
+      name, phone, rating: pickedStars, text,
+      status: 'pending',
+      createdAt: serverTimestamp()
+    });
     showToast('✅ Thanks! Your review is pending approval.');
     document.getElementById('revName').value = '';
     document.getElementById('revPhone').value = '';
     document.getElementById('revText').value = '';
     pickedStars = 0;
     paintStars(0, false);
-  } catch(err){ console.error(err); showToast('❌ Could not submit. Try again.'); }
-  finally { btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Review'; }
+    // Optimistically reload (admin-approved reviews will show up)
+    setTimeout(loadReviews, 1000);
+  } catch(err){
+    console.error('Submit error:', err);
+    showToast('❌ ' + (err.code || err.message || 'Could not submit'));
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Review';
+  }
 });
 
-function escapeHtml(s){
-  if (!s) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
-}
+function escapeHtml(s){ if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
 
 loadProducts();
 loadReviews();
